@@ -22,39 +22,9 @@ let diceImages = [
  * @param {string} choice - プレイヤーの選択 ('CHO' または 'HAN')
  */
 function playGame(choice) {
-    let inputBet = document.querySelector("#bet");
-
-    // 入力値のクリーンアップ：先頭の0を削除し数値に変換
-    beAmout = +inputBet.value;
-    inputBet.value = beAmout; 
-
-    // バリデーション：所持金チェック
-    if (beAmout > money) {
-        inputBet.value = 10;
-        document.querySelector(".notification").innerText = "賭け金の上限を超えています";
-        document.querySelector(".notification").style.color = "red";
-        toggleButtons(false);
+    if(checkBet() === false){
         return;
     }
-
-    // バリデーション：最小値チェック
-    if (beAmout <= 0) {
-        inputBet.value = 10;
-        document.querySelector(".notification").innerText = "賭け金は1以上で入力してください";
-        document.querySelector(".notification").style.color = "red";
-        toggleButtons(false);
-        return;
-    }
-
-    // バリデーション：数値形式チェック
-    if (isNaN(beAmout)) {
-        inputBet.value = 10;
-        document.querySelector(".notification").innerText = "金額を再入力してください";
-        document.querySelector(".notification").style.color = "red";
-        toggleButtons(false);
-        return;
-    }
-
     try {
         // ボタンを無効化し、選択されたボタンを強調
         toggleButtons(true, choice);
@@ -203,4 +173,45 @@ function toggleButtons(status, choice) {
     } catch (error) {
         console.error("UI制御エラー:", error);
     }
+}
+function checkBet(){
+    let inputBet = document.querySelector("#bet");
+    let notification = document.querySelector(".notification")
+    const errorMessages = {
+        OVER_BALANCE: "賭け金の上限を超えています",    
+        MIN_VALUE: "賭け金は1以上で入力してください",    
+        INVALID_NUM: "金額を再入力してください"          
+    };
+
+    // 入力値のクリーンアップ：先頭の0を削除し数値に変換
+    beAmout = +inputBet.value;
+    inputBet.value = beAmout; 
+
+    // バリデーション：所持金チェック
+    if (beAmout > money) {
+        inputBet.value = 10;
+        notification.innerText = errorMessages.OVER_BALANCE;
+        notification.style.color = "red";
+        toggleButtons(false);
+        return false;
+    }
+
+    // バリデーション：最小値チェック
+    if (beAmout <= 0) {
+        inputBet.value = 10;
+        notification.innerText = errorMessages.MIN_VALUE;
+        notification.style.color = "red";
+        toggleButtons(false);
+        return false;
+    }
+
+    // バリデーション：数値形式チェック
+    if (isNaN(beAmout)) {
+        inputBet.value = 10;
+        notification.innerText = errorMessages.INVALID_NUM;
+        notification.style.color = "red";
+        toggleButtons(false);
+        return false;
+    }
+    return true;
 }
